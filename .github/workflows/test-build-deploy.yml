@@ -43,18 +43,19 @@ jobs:
 
             -   uses: FranzDiebold/github-env-vars-action@v2
 
-            -   name: Set tags names
-                run: |
-                    echo "TAG_MAJOR=$(echo $CI_REF_NAME | cut -d. -f1)" >> $GITHUB_ENV
-                    echo "TAG_MINOR=$TAG_MAJOR.$(echo $CI_REF_NAME | cut -d. -f2)" >> $GITHUB_ENV
+            -   name: Set major tag name
+                run: echo "TAG_MAJOR=$(echo $CI_REF_NAME | cut -d. -f1)" >> $GITHUB_ENV
+
+            -   name: Set major tag name
+                run: echo "TAG_MINOR=${{ env.TAG_MAJOR }}.$(echo $CI_REF_NAME | cut -d. -f2)" >> $GITHUB_ENV
 
             -   name: Build image
                 run: |
                     docker build --no-cache \
                         -t williarin/secure-mysql-backups:latest \
                         -t williarin/secure-mysql-backups:$CI_REF_NAME \
-                        -t williarin/secure-mysql-backups:$TAG_MAJOR \
-                        -t williarin/secure-mysql-backups:$TAG_MINOR \
+                        -t williarin/secure-mysql-backups:${{ env.TAG_MAJOR }} \
+                        -t williarin/secure-mysql-backups:${{ env.TAG_MINOR }} \
                         --target base .
 
             -   name: Save Docker image as artifact
@@ -62,8 +63,8 @@ jobs:
                     docker save -o /tmp/image.tar \
                         williarin/secure-mysql-backups:latest \
                         williarin/secure-mysql-backups:$CI_REF_NAME \
-                        williarin/secure-mysql-backups:$TAG_MAJOR \
-                        williarin/secure-mysql-backups:$TAG_MINOR
+                        williarin/secure-mysql-backups:${{ env.TAG_MAJOR }} \
+                        williarin/secure-mysql-backups:${{ env.TAG_MINOR }}
 
             -   name: Upload artifact
                 uses: actions/upload-artifact@v2
