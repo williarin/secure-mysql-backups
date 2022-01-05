@@ -1,0 +1,17 @@
+#!/usr/bin/env bash
+
+set -e
+
+SCRIPT_DIR=$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" &> /dev/null && pwd)
+source "$SCRIPT_DIR/lib/env.sh"
+
+cron_minute=$(get_env "CRON_MINUTE" "0")
+cron_hour=$(get_env "CRON_HOUR" "0")
+cron_time=$(get_env "CRON_TIME" "$cron_minute $cron_hour * * *")
+
+tail -F /var/log/backup.log &
+
+echo "Launching cron service..."
+
+echo "$cron_time backup >> /var/log/backup.log" > /etc/crontabs/root
+exec crond -f -L /var/log/cron.log

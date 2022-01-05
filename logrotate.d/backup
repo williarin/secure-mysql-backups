@@ -1,0 +1,10 @@
+/var/log/backup.log
+{
+	rotate 4
+	weekly
+	maxsize 10M
+	missingok
+	notifempty
+	compress
+	delaycompress
+}

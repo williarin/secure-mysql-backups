@@ -1,0 +1,24 @@
+version: '3.8'
+
+services:
+    database:
+        image: mysql:8
+        restart: 'no'
+        environment:
+            - MYSQL_DATABASE=my_db
+            - MYSQL_ROOT_PASSWORD=root
+
+    backup:
+        image: williarin/secure-mysql-backups:1
+        restart: 'no'
+        depends_on:
+            - database
+        volumes:
+            - ./backup:/backup
+        environment:
+            MYSQL_HOST: database
+            MYSQL_USER: root
+            MYSQL_PASSWORD: root
+            CHOWN_FILES: '1000:1000'
+            MAX_CPU: 4
+            AES_PASSPHRASE: my_passphrase

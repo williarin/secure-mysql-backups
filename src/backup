@@ -1,0 +1,34 @@
+#!/usr/bin/env bash
+
+set -e
+
+SCRIPT_DIR=$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" &> /dev/null && pwd)
+source "$SCRIPT_DIR/lib/env.sh"
+source "$SCRIPT_DIR/lib/db.sh"
+source "$SCRIPT_DIR/lib/file.sh"
+
+host="$(get_env "MYSQL_HOST" "mysql")"
+user="$(get_env "MYSQL_USER" "root")"
+port="$(get_env "MYSQL_PORT" "3306")"
+password="$(get_env "MYSQL_PASSWORD")"
+databases="$(get_env "MYSQL_DATABASE" "$(get_databases_list "$host" "$port" "$user" "$password")")"
+individual_backups="$(get_env "INDIVIDUAL_BACKUPS" false)"
+backup_name="$(get_env "BACKUP_NAME" "main-backup")"
+
+echo "Backup started at $(date)."
+
+for database in $databases; do
+    dump "$host" "$port" "$user" "$password" "$database" || continue
+
+    if [ "$individual_backups" = true ]; then
+        archive_file="$(get_archive_name "$backup_name.$database")"
+        create_archive "$archive_file" "$database.sql"
+    fi
+done
+
+if [ "$individual_backups" = false ]; then
+    archive_file="$(get_archive_name "$backup_name")"
+    create_archive "$archive_file" "*.sql"
+fi
+
+echo "Backup finished at $(date)."
