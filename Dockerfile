@@ -15,7 +15,7 @@ RUN apk --update add \
     && chmod 755 /backup
 
 COPY ./src/ /usr/local/bin
-COPY ./logrotate.d/* /etc/logrotate.d
+COPY ./logrotate.d/* /etc/logrotate.d/
 
 CMD [ "run" ]
 
