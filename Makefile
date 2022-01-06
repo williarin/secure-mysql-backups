@@ -1,10 +1,6 @@
-all: test build
+all: test
 
 .PHONY: test
 test:
-	@for file in $$(find src -type f); do shellcheck --format=tty $$file; done;
-	@sudo ./test/bats/bin/bats test/unit
-
-.PHONY: build
-build:
-	docker build -t williarin/secure-mysql-backups:latest --target base .
+	@for file in $$(find ./src -type f); do shellcheck -e 1091,2012 --format=tty $$file; done;
+	@./test/bats/bin/bats test/unit

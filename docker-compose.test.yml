@@ -1,0 +1,19 @@
+# Docker Compose file for executing test suite
+
+version: '3.8'
+
+services:
+    database:
+        image: mysql:8
+        restart: 'no'
+        environment:
+            - MYSQL_DATABASE=my_db
+            - MYSQL_ROOT_PASSWORD=root
+
+    backup:
+        build:
+            context: .
+            target: test
+        restart: 'no'
+        depends_on:
+            - database
