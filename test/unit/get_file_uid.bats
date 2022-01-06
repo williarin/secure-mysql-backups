@@ -1,19 +1,16 @@
 setup() {
     DIR="$( cd "$( dirname "$BATS_TEST_FILENAME" )" >/dev/null 2>&1 && pwd )"
     PATH="$DIR/../../src:$DIR/../../src/lib:$PATH"
+    source file.sh
 }
 
 @test "fails if no argument given" {
-    source file.sh
-
     run get_file_uid
     [ "$status" -eq 1 ]
     [ "$output" = "1 argument required, 0 provided" ]
 }
 
 @test "fails if file does not exist" {
-    source file.sh
-
     file="/not_a_file"
 
     run get_file_uid "$file"
@@ -22,8 +19,6 @@ setup() {
 }
 
 @test "outputs file's known user uid" {
-    source file.sh
-
     file="/tmp/test_file"
     touch "$file"
 
@@ -35,8 +30,6 @@ setup() {
 }
 
 @test "outputs file's unknown user uid" {
-    source file.sh
-
     file="/tmp/test_file"
     touch "$file"
     chown "1054:2344" "$file"

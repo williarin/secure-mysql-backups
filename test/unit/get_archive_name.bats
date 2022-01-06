@@ -1,19 +1,16 @@
 setup() {
     DIR="$( cd "$( dirname "$BATS_TEST_FILENAME" )" >/dev/null 2>&1 && pwd )"
     PATH="$DIR/../../src:$DIR/../../src/lib:$PATH"
+    source file.sh
 }
 
 @test "fails if no argument given" {
-    source file.sh
-
     run get_archive_name
     [ "$status" -eq 1 ]
     [ "$output" = "At least 1 argument required, 0 provided" ]
 }
 
 @test "Wednesday creates a daily backup" {
-    source file.sh
-
     shopt -s expand_aliases
     alias date="FAKETIME='2022-01-05 06:35:46' date"
 
@@ -24,8 +21,6 @@ setup() {
 }
 
 @test "Saturday creates a weekly backup" {
-    source file.sh
-
     shopt -s expand_aliases
     alias date="FAKETIME='2022-02-19 12:54:11' date"
 
@@ -36,8 +31,6 @@ setup() {
 }
 
 @test "last day of the month creates a monthly backup" {
-    source file.sh
-
     shopt -s expand_aliases
     alias date="FAKETIME='2022-02-28 18:43:24' date"
 
