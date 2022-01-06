@@ -17,10 +17,21 @@ RUN apk --update add \
 COPY ./src/ /usr/local/bin
 COPY ./logrotate.d/* /etc/logrotate.d/
 
-CMD [ "run" ]
+CMD [ "run-cron" ]
 
 
-FROM base AS dev
+FROM base AS test
 
-COPY --from=trajano/alpine-libfaketime  /faketime.so /lib/faketime.so
+COPY --from=trajano/alpine-libfaketime /faketime.so /lib/faketime.so
 ENV LD_PRELOAD=/lib/faketime.so
+
+RUN apk add shellcheck make \
+    && mkdir -p /usr/src/secure-mysql-backups
+
+COPY ./src/ /usr/src/secure-mysql-backups/src/
+COPY ./test/ /usr/src/secure-mysql-backups/test/
+COPY ./Makefile /usr/src/secure-mysql-backups
+
+WORKDIR /usr/src/secure-mysql-backups
+
+CMD [ "tail", "-f", "/dev/null" ]

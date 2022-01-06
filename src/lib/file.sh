@@ -3,6 +3,48 @@
 SCRIPT_DIR=$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" &> /dev/null && pwd)
 source "$SCRIPT_DIR/env.sh"
 
+#/ Get the file UID, even if the user doesn't exist
+#/
+#/ @usage var="$(get_file_uid "path/to/file")"
+#/
+#/ @param $1 Path to file
+#/ @return Prints the UID of the file
+get_file_uid () {
+    if [ "$#" -ne 1 ]; then
+        echo "1 argument required, $# provided"
+        exit 1
+    fi
+
+    if [ ! -f "$1" ]; then
+        echo "File $1 does not exist"
+        exit 1
+    fi
+
+    id -u "$(ls -ld "$1" | awk '{print $3}')" 2>/dev/null \
+        || ls -ld "$1" | awk '{print $3}'
+}
+
+#/ Get the file GID, even if the group doesn't exist
+#/
+#/ @usage var="$(get_file_gid "path/to/file")"
+#/
+#/ @param $1 Path to file
+#/ @return Prints the GID of the file
+get_file_gid () {
+    if [ "$#" -ne 1 ]; then
+        echo "1 argument required, $# provided"
+        exit 1
+    fi
+
+    if [ ! -f "$1" ]; then
+        echo "File $1 does not exist"
+        exit 1
+    fi
+
+    id -g "$(ls -ld "$1" | awk '{print $4}')" 2>/dev/null \
+        || ls -ld "$1" | awk '{print $4}'
+}
+
 #/ Get an archive name corresponding to the current name
 #/
 #/ @usage var="$(get_archive_name "my-backup-name")"

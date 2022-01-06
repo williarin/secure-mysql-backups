@@ -15,7 +15,7 @@ setup() {
     source file.sh
 
     shopt -s expand_aliases
-    alias date="faketime '2022/01/05 06:35:46' date"
+    alias date="FAKETIME='2022-01-05 06:35:46' date"
 
     run get_archive_name "main-backup"
     echo "$output"
@@ -27,7 +27,7 @@ setup() {
     source file.sh
 
     shopt -s expand_aliases
-    alias date="faketime '2022/02/19 12:54:11' date"
+    alias date="FAKETIME='2022-02-19 12:54:11' date"
 
     run get_archive_name "main-backup"
     echo "$output"
@@ -39,7 +39,7 @@ setup() {
     source file.sh
 
     shopt -s expand_aliases
-    alias date="faketime '2022/02/28 18:43:24' date"
+    alias date="FAKETIME='2022-02-28 18:43:24' date"
 
     run get_archive_name "main-backup"
     [ "$status" -eq 0 ]

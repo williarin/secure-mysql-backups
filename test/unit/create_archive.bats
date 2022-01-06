@@ -2,8 +2,8 @@ setup() {
     DIR="$( cd "$( dirname "$BATS_TEST_FILENAME" )" >/dev/null 2>&1 && pwd )"
     PATH="$DIR/../../src:$DIR/../../src/lib:$PATH"
 
-    sudo mkdir -p /tmp/backup /backup
-    sudo chown "$USER:$GROUP" /tmp/backup /backup
+    mkdir -p /tmp/backup /backup
+    chown "$USER:$GROUP" /tmp/backup /backup
 }
 
 @test "fails if no argument given" {
@@ -87,20 +87,21 @@ setup() {
 
     echo "MYSQL_DUMP" > /tmp/backup/my_db.sql
 
-    CHOWN_FILES="1000:1000"
+    CHOWN_FILES="1000:2500"
 
     run create_archive "my-backup-name.my_db.day1-Monday.tgz" "my_db.sql"
     [ "$status" -eq 0 ]
     [ -f "/backup/my-backup-name.my_db.day1-Monday.tgz" ]
     [ ! -f "/tmp/backup/my_db.sql" ]
-    [ "$(id -u $(stat -c "%U" "/backup/my-backup-name.my_db.day1-Monday.tgz"))" -eq 1000 ]
-    [ "$(id -g $(stat -c "%G" "/backup/my-backup-name.my_db.day1-Monday.tgz"))" -eq 1000 ]
+    [ "$(get_file_uid "/backup/my-backup-name.my_db.day1-Monday.tgz")" -eq 1000 ]
+    [ "$(get_file_gid "/backup/my-backup-name.my_db.day1-Monday.tgz")" -eq 2500 ]
 
     run tar xzf "/backup/my-backup-name.my_db.day1-Monday.tgz" -C /backup/
     [ "$status" -eq 0 ]
     [ -f "/backup/my_db.sql" ]
     [ "$(cat /backup/my_db.sql)" == "MYSQL_DUMP" ]
-    [ "$(id -u $(stat -c "%U" "/backup/my_db.sql"))" -eq 1000 ]
+    [ "$(get_file_uid "/backup/my_db.sql")" -eq 1000 ]
+    [ "$(get_file_gid "/backup/my_db.sql")" -eq 2500 ]
 
     run rm -f /backup/my_db.sql /backup/my-backup-name.my_db.day1-Monday.tgz
 }

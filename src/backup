@@ -18,7 +18,7 @@ backup_name="$(get_env "BACKUP_NAME" "main-backup")"
 echo "Backup started at $(date)."
 
 for database in $databases; do
-    dump "$host" "$port" "$user" "$password" "$database" || continue
+    dump_database "$host" "$port" "$user" "$password" "$database" || continue
 
     if [ "$individual_backups" = true ]; then
         archive_file="$(get_archive_name "$backup_name.$database")"
