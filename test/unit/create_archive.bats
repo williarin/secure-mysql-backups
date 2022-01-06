@@ -1,30 +1,25 @@
 setup() {
     DIR="$( cd "$( dirname "$BATS_TEST_FILENAME" )" >/dev/null 2>&1 && pwd )"
     PATH="$DIR/../../src:$DIR/../../src/lib:$PATH"
+    source file.sh
 
     mkdir -p /tmp/backup /backup
     chown "$USER:$GROUP" /tmp/backup /backup
 }
 
 @test "fails if no argument given" {
-    source file.sh
-
     run create_archive
     [ "$status" -eq 1 ]
     [ "$output" = "2 arguments required, 0 provided" ]
 }
 
 @test "fails if 1 argument given" {
-    source file.sh
-
     run create_archive "my-backup-name.my_db.day1-Monday.tgz"
     [ "$status" -eq 1 ]
     [ "$output" = "2 arguments required, 1 provided" ]
 }
 
 @test "creates a tgz archive with a single file" {
-    source file.sh
-
     echo "MYSQL_DUMP" > /tmp/backup/my_db.sql
 
     run create_archive "my-backup-name.my_db.day1-Monday.tgz" "my_db.sql"
@@ -41,8 +36,6 @@ setup() {
 }
 
 @test "creates a tgz archive with multiple files" {
-    source file.sh
-
     echo "MYSQL_DUMP1" > /tmp/backup/my_db1.sql
     echo "MYSQL_DUMP2" > /tmp/backup/my_db2.sql
     echo "MYSQL_DUMP3" > /tmp/backup/my_db3.sql
@@ -67,8 +60,6 @@ setup() {
 }
 
 @test "creates a tgz archive with AES encryption" {
-    source file.sh
-
     echo "MYSQL_DUMP" > /tmp/backup/my_db.sql
 
     AES_PASSPHRASE="secret-passphrase"
@@ -83,8 +74,6 @@ setup() {
 }
 
 @test "creates a tgz archive with another owner and group" {
-    source file.sh
-
     echo "MYSQL_DUMP" > /tmp/backup/my_db.sql
 
     CHOWN_FILES="1000:2500"
@@ -107,8 +96,6 @@ setup() {
 }
 
 @test "creates a tgz archive using 1 CPU only" {
-    source file.sh
-
     echo "MYSQL_DUMP" > /tmp/backup/my_db.sql
 
     MAX_CPU=1

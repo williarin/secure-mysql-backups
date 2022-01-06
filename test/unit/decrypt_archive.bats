@@ -1,30 +1,25 @@
 setup() {
     DIR="$( cd "$( dirname "$BATS_TEST_FILENAME" )" >/dev/null 2>&1 && pwd )"
     PATH="$DIR/../../src:$DIR/../../src/lib:$PATH"
+    source file.sh
 
     mkdir -p /tmp/backup /backup
     chown "$USER:$GROUP" /tmp/backup /backup
 }
 
 @test "fails if no argument given" {
-    source file.sh
-
     run decrypt_archive
     [ "$status" -eq 1 ]
     [ "$output" = "1 argument required, 0 provided" ]
 }
 
 @test "fails if no passphrase given" {
-    source file.sh
-
     run decrypt_archive "my-backup-name.my_db.day1-Monday.tgz"
     [ "$status" -eq 1 ]
     [ "$output" = "You must provide a passphrase to decrypt the file" ]
 }
 
 @test "decrypts an archive" {
-    source file.sh
-
     echo "MYSQL_DUMP" > /tmp/backup/my_db.sql
 
     AES_PASSPHRASE="secret-passphrase"
@@ -44,8 +39,6 @@ setup() {
 }
 
 @test "decrypts an archive and set permissions to another user and group" {
-    source file.sh
-
     echo "MYSQL_DUMP" > /tmp/backup/my_db.sql
 
     CHOWN_FILES="1000:1000"
