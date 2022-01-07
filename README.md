@@ -150,4 +150,4 @@ docker compose run --rm backup decrypt main-backup.day3-Wednesday.tgz.aes
 
 Use a numbered tag if you want to avoid BC breaks.
 
-* `1.0.0`, `1.0`, `1`, `latest`
+* `1.1.0`, `1.1`, `1`, `latest`
