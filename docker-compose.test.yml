@@ -17,3 +17,8 @@ services:
         restart: 'no'
         depends_on:
             - database
+        volumes:
+            - ./src:/usr/local/bin
+            - ./src:/usr/src/secure-mysql-backups/src
+            - ./test:/usr/src/secure-mysql-backups/test
+            - ./Makefile:/usr/src/secure-mysql-backups/Makefile

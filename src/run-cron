@@ -8,10 +8,12 @@ source "$SCRIPT_DIR/lib/env.sh"
 cron_minute=$(get_env "CRON_MINUTE" "0")
 cron_hour=$(get_env "CRON_HOUR" "0")
 cron_time=$(get_env "CRON_TIME" "$cron_minute $cron_hour * * *")
-
-tail -F /var/log/backup.log &
-
-echo "Launching cron service..."
+test_env=$(get_env "TEST_ENV" false)
 
 echo "$cron_time backup >> /var/log/backup.log" > /etc/crontabs/root
-exec crond -f -L /var/log/cron.log
+
+if [ "$test_env" = false ]; then
+    echo "Launching cron service..."
+    tail -F /var/log/backup.log &
+    exec crond -f -L /var/log/cron.log
+fi
