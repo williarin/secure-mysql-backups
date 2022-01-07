@@ -1,0 +1,26 @@
+name: Test
+
+on:
+    push:
+        branches:
+            - '**'
+    pull_request:
+        branches:
+            - master
+
+jobs:
+    test:
+        name: Test
+
+        runs-on: ubuntu-20.04
+
+        steps:
+            -   uses: actions/checkout@v2
+                with:
+                    submodules: recursive
+
+            -   name: Launch Docker containers
+                run: docker compose -f docker-compose.test.yml up -d --build
+
+            -   name: Test
+                run: docker compose -f docker-compose.test.yml exec backup make test

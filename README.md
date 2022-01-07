@@ -2,13 +2,35 @@
 
 This Docker image will backup your MySQL/MariaDB databases following the Grandfather-Father-Son (GFS) retention scheme.
 
+## Features
+
+* GFS backups retention scheme
+* AES256 encryption/decryption
+* Single or multiple databases backups
+* Grouped or individual archives
+* Parallelized compression
+
+## GFS retention scheme
+
 This means that you'll always have:
 
-* A backup for every day of the last week
-* A backup for every week of the last month
-* A backup for every month of the last year
+* A backup for every day of the last week (6)
+* A backup for every week of the last month (4)
+* A backup for every month of the last year (12)
+* A backup for every previous year (unlimited)
+
+For a 100MB backup, it will cost you around 2GB for the current year + 100MB for each previous year.
+
+In SuperSafe mode, you'll have:
+
+* A backup for every day of the last month (28~31)
+* A backup for every week of the last year (48)
+* A backup for every previous year (unlimited)
+
+For a 100MB backup, backups will cost you around 8GB for the current year + 100MB for each previous year.
 
 Backups are run by default every day at 00:00 UTC.
+
 
 ## Usage
 
@@ -32,6 +54,7 @@ As an example, you can use: `MYSQL_PASSWORD_FILE=/run/secret/mysql-root-password
 
 | Variable | Description | Default |
 | -------- | ----------- | ------- |
+| `SUPERSAFE_MODE` | Run backups in SuperSafe mode. This means many more backups ([see details](#gfs-retention-scheme)). | `false` |
 | `MYSQL_HOST` | The host of your MySQL/MariaDB database. | `mysql` |
 | `MYSQL_PORT` | The port number of your MySQL/MariaDB database. | `3306` |
 | `MYSQL_USER` | The username of your MySQL/MariaDB database. | `root` |

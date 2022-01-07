@@ -45,19 +45,19 @@ get_file_gid () {
         || ls -ld "$1" | awk '{print $4}'
 }
 
-#/ Get an archive name corresponding to the current name
+#/ Get an archive name corresponding to the current day
 #/
 #/ @usage var="$(get_archive_name "my-backup-name")"
 #/
 #/ @param $1 Backup name
-#/ @return Prints the result
+#/ @return Prints the generated archive name
 get_archive_name () {
     if [ "$#" -lt 1 ]; then
         echo "At least 1 argument required, $# provided"
         exit 1
     fi
 
-    local day day_num month_num week_file backup_name archive_file
+    local day day_num month_num year_num week_file backup_name archive_file
     backup_name="$1"
 
     # Find which week of the month 1-4 it is.
@@ -74,7 +74,10 @@ get_archive_name () {
 
     # Create archive filename.
     day=$(date +%A)
-    if [ "$(date +%-d)" -eq "$(date -d "$(date +%-m)/1 + 1 month - 1 day" "+%d")" ]; then
+    if [ "$(date +%m-%d)" = "12-31" ]; then
+        year_num=$(date +%Y)
+        archive_file="$backup_name.year$year_num.tgz"
+    elif [ "$(date +%-d)" -eq "$(date -d "$(date +%-m)/1 + 1 month - 1 day" "+%d")" ]; then
         month_num=$(date +%m)
         archive_file="$backup_name.month$month_num.tgz"
     elif [ "$day" != "Saturday" ]; then
@@ -82,6 +85,38 @@ get_archive_name () {
         archive_file="$backup_name.day$day_of_the_week-$day.tgz"
     else
         archive_file=$week_file
+    fi
+
+    echo "$archive_file"
+}
+
+#/ Get an archive name corresponding to the current day
+#/
+#/ @usage var="$(get_archive_name "my-backup-name")"
+#/
+#/ @param $1 Backup name
+#/ @return Prints the generated archive name
+get_archive_name_supersafe_mode () {
+    if [ "$#" -lt 1 ]; then
+        echo "At least 1 argument required, $# provided"
+        exit 1
+    fi
+
+    local day_num day_num_pad week_num year_num backup_name archive_file
+    backup_name="$1"
+
+    day_num=$(date +%-d)
+    day_num_pad=$(date +%d)
+    week_num=$(date +%V)
+    year_num=$(date +%Y)
+
+    # Create archive filename.
+    if [ "$(date +%m-%d)" = "12-31" ]; then
+        archive_file="$backup_name.year$year_num.tgz"
+    elif [ "$((day_num % 7))" -eq 0 ]; then
+        archive_file="$backup_name.week$week_num.tgz"
+    else
+        archive_file="$backup_name.day$day_num_pad.tgz"
     fi
 
     echo "$archive_file"
@@ -120,8 +155,7 @@ create_archive () {
     fi
 
     bash -c "rm -f /tmp/backup/$2 /tmp/backup/$archive_file"
-    chown -f "$chown_files" "/backup/$archive_file" "/backup/$archive_file.aes"
-    exit 0
+    chown -f "$chown_files" "/backup/$archive_file" "/backup/$archive_file.aes" || true
 }
 
 

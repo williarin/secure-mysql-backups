@@ -11,9 +11,13 @@ host="$(get_env "MYSQL_HOST" "mysql")"
 user="$(get_env "MYSQL_USER" "root")"
 port="$(get_env "MYSQL_PORT" "3306")"
 password="$(get_env "MYSQL_PASSWORD")"
-databases="$(get_env "MYSQL_DATABASE" "$(get_databases_list "$host" "$port" "$user" "$password")")"
 individual_backups="$(get_env "INDIVIDUAL_BACKUPS" false)"
 backup_name="$(get_env "BACKUP_NAME" "main-backup")"
+supersafe_mode="$(get_env "SUPERSAFE_MODE" false)"
+
+wait_for_database "$host" "$port" "$user" "$password" "60"
+
+databases="$(get_env "MYSQL_DATABASE" "$(get_databases_list "$host" "$port" "$user" "$password")")"
 
 echo "Backup started at $(date)."
 
@@ -21,13 +25,23 @@ for database in $databases; do
     dump_database "$host" "$port" "$user" "$password" "$database" || continue
 
     if [ "$individual_backups" = true ]; then
-        archive_file="$(get_archive_name "$backup_name.$database")"
+        if [ "$supersafe_mode" = true ]; then
+            archive_file="$(get_archive_name_supersafe_mode "$backup_name.$database")"
+        else
+            archive_file="$(get_archive_name "$backup_name.$database")"
+        fi
+
         create_archive "$archive_file" "$database.sql"
     fi
 done
 
 if [ "$individual_backups" = false ]; then
-    archive_file="$(get_archive_name "$backup_name")"
+    if [ "$supersafe_mode" = true ]; then
+        archive_file="$(get_archive_name_supersafe_mode "$backup_name")"
+    else
+        archive_file="$(get_archive_name "$backup_name")"
+    fi
+
     create_archive "$archive_file" "*.sql"
 fi
 
