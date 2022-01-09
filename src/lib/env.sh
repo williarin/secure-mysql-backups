@@ -1,5 +1,7 @@
 #!/usr/bin/env bash
 
+set -euo pipefail
+
 #/ Helper function to lookup "env_FILE", "env", then fallback
 #/
 #/ @usage var="$(get_env "MYSQL_PASSWORD" "fallback_value")"

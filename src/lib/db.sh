@@ -1,5 +1,7 @@
 #!/usr/bin/env bash
 
+set -euo pipefail
+
 #/ Retrieve the list of all databases, excluding system databases
 #/
 #/ @usage var="$(mysql_command "localhost" "3306" "root" "root" "SHOW DATABASES;")"

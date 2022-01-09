@@ -4,7 +4,7 @@ setup() {
     source file.sh
 
     mkdir -p /tmp/backup /backup
-    chown "$USER:$GROUP" /tmp/backup /backup
+    chown "$(id -u):$(id -g)" /tmp/backup /backup
 }
 
 @test "fails if no argument given" {
