@@ -1,0 +1,6 @@
+#!/usr/bin/env bash
+
+set -euo pipefail
+
+tail -F /var/log/backup.log &
+exec crond -f -L /var/log/cron.log
