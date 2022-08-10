@@ -12,8 +12,14 @@ test_env=$(get_env "TEST_ENV" false)
 
 echo "$cron_time backup >> /var/log/backup.log" > /etc/crontabs/root
 
-if [ "$test_env" = false ]; then
-    echo "Launching cron service..."
-    tail -F /var/log/backup.log &
-    exec crond -f -L /var/log/cron.log
+echo "Launching cron service..."
+
+if [ ! -f "/var/log/backup.log" ]; then
+    touch /var/log/backup.log
+fi
+
+if [ "$test_env" = true ]; then
+    timeout 1 run-cron-service
+else
+    run-cron-service
 fi
